@@ -1,0 +1,17 @@
+{
+  "name": "dash-cobrancas",
+  "version": "1.0.0",
+  "description": "Dashboard de cobranças com front-end separado e proxy para webhook n8n.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.18.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,21 @@
+# Arquivos com credenciais/configurações locais
+.env
+.env.local
+public/js/config.js
+
+# Dependências
+node_modules/
+
+# Builds e caches
+dist/
+build/
+.cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
