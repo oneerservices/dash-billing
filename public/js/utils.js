@@ -153,23 +153,19 @@ function getVencimentosLinha(r) {
 }
 
 function getVencimentoAtualLinha(r) {
-  const vencs = getVencimentosLinha(r).sort((a, b) => a.data - b.data);
+  const vencs = getVencimentosLinha(r);
 
-  if (!vencs.length) return { data: null, texto: '—' };
+  if (!vencs.length) {
+    return { data: null, texto: '—', numero: null };
+  }
 
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
+  // Regra nova:
+  // usa sempre a última coluna de vencimento preenchida:
+  // Vencimento 4 > Vencimento 3 > Vencimento 2 > Vencimento 1
+  const ultimoInformado = vencs
+    .sort((a, b) => b.numero - a.numero)[0];
 
-  // Se existir vencimento hoje, ele é o vencimento atual.
-  const hojeItem = vencs.find(v => mesmoDia(v.data, hoje));
-  if (hojeItem) return hojeItem;
-
-  // Se tiver vencidos, prioriza o mais antigo em aberto.
-  const vencidos = vencs.filter(v => v.data < hoje);
-  if (vencidos.length) return vencidos[0];
-
-  // Senão, o próximo futuro.
-  return vencs[0];
+  return ultimoInformado;
 }
 
 function linhaTemVencimentoNoStatus(r, statusFiltro) {
@@ -226,20 +222,17 @@ function calcularResumoStatus(rows) {
 
 
 function menorVencimentoTexto(rows) {
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
-  const atuais = rows
+  const vencimentos = rows
     .map(r => getVencimentoAtualLinha(r))
     .filter(x => x && x.data);
 
-  const hojeItem = atuais.find(x => mesmoDia(x.data, hoje));
-  if (hojeItem) return hojeItem.texto || '—';
+  if (!vencimentos.length) return '—';
 
-  atuais.sort((a, b) => a.data - b.data);
-  return atuais.length ? atuais[0].texto : '—';
+  // Para cliente com vários itens, mostra a última data informada mais recente
+  vencimentos.sort((a, b) => b.data - a.data);
+
+  return vencimentos[0].texto || '—';
 }
-
 
 function getUltimoPagamentoCliente(nome, rows = baseRowsRaw) {
   const nomeNorm = normalizarTexto(nome);
