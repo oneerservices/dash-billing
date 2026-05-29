@@ -114,8 +114,8 @@
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="filter-btn" onclick="clearSelection()">✕ Limpar</button>
-        <button class="btn-disparar" id="btn-disparar" onclick="openModal()">
-          <span>📲</span> Disparar Cobranças
+        <button class="btn-disparar" id="btn-disparar" onclick="iniciarFilaCobranca()">
+        <span>💬</span> Cobrar Selecionados
         </button>
       </div>
     </div>
@@ -230,6 +230,63 @@
   </div>
 </div>
 
+<div class="queue-overlay" id="queue-overlay">
+  <div class="queue-modal">
+    <div class="queue-header">
+      <div>
+        <div class="queue-eyebrow">Fila de cobrança</div>
+        <div class="queue-title">Cobrar selecionados</div>
+      </div>
+      <button class="queue-close" onclick="fecharFilaCobranca()">✕</button>
+    </div>
+
+    <div class="queue-body">
+      <div class="queue-progress-top">
+        <span id="queue-counter">Cliente 0 de 0</span>
+        <span id="queue-status">Aguardando início</span>
+      </div>
+
+      <div class="queue-progress-bar-wrap">
+        <div class="queue-progress-bar" id="queue-progress-bar"></div>
+      </div>
+
+      <div class="queue-client-card">
+        <div class="queue-client-label">Cliente atual</div>
+        <div class="queue-client-name" id="queue-client-name">—</div>
+        <div class="queue-client-info" id="queue-client-info">
+          Selecione os clientes e inicie a cobrança.
+        </div>
+      </div>
+
+      <div class="queue-wait-box" id="queue-wait-box" style="display:none">
+        <div class="queue-spinner"></div>
+        <div>
+          <div class="queue-wait-title">
+            Aguardando para liberar o próximo cliente...
+          </div>
+          <div class="queue-wait-sub" id="queue-wait-sub">
+            Isso ajuda a evitar bloqueios de pop-up.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="queue-actions">
+      <button class="queue-btn-secondary" onclick="pularClienteFila()">
+        Pular
+      </button>
+
+      <button class="queue-btn-secondary" onclick="fecharFilaCobranca()">
+        Cancelar
+      </button>
+
+      <button class="queue-btn-primary" id="queue-main-btn" onclick="abrirWhatsappFilaAtual()">
+        Abrir WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
 <script src="js/config.js"></script>
 <script src="js/config-loader.js"></script>
 <script src="js/state.js"></script>
@@ -238,6 +295,7 @@
 <script src="js/api.js"></script>
 <script src="js/contacts.js"></script>
 <script src="js/whatsapp.js"></script>
+<script src="js/whatsapp-queue.js"></script>
 <script src="js/detail.js"></script>
 <script src="js/table.js"></script>
 <script src="js/modal.js"></script>
