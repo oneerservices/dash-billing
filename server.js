@@ -40,6 +40,15 @@ app.post('/api/cobrancas', async (req, res) => {
   }
 });
 
+app.get('/api/version', (req, res) => {
+  const packageJson = require('./package.json');
+
+  res.json({
+    version: packageJson.version || '1.0.0',
+    name: packageJson.name || 'dash-cobrancas'
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Dash rodando em http://localhost:${PORT}`);
 });

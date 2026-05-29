@@ -14,16 +14,21 @@
 <header>
   <div class="container">
     <div class="header-inner">
-      <div class="logo">
-        <div class="logo-dot"></div>
-        Rodrigo Iphones <span style="color:var(--muted);font-weight:400;font-size:16px;">/cobranças</span>
-      </div>
+<div class="logo">
+  <img src="assets/logo.png" alt="Rodrigo Iphones" class="logo-img">
+  <span class="logo-section">/cobranças</span>
+</div>
       <div class="header-right" id="header-right">
-        <button class="refresh-btn" id="btn-refresh" style="display:none" onclick="loadSheetData()">
-          ↺ Atualizar
-        </button>
-        <div id="user-area"></div>
-      </div>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+    🌙 Escuro
+  </button>
+
+  <button class="refresh-btn" id="btn-refresh" style="display:none" onclick="loadSheetData()">
+    ↺ Atualizar
+  </button>
+
+  <div id="user-area"></div>
+</div>
     </div>
   </div>
 </header>
@@ -167,6 +172,12 @@
     </div>
   </div>
 </div>
+
+<footer class="app-footer">
+  <span>Powered by <strong>oneer.com.br</strong></span>
+  <span class="footer-separator">•</span>
+  <span id="app-version">v—</span>
+</footer>
 
 <script src="js/config.js"></script>
 <script src="js/config-loader.js"></script>
