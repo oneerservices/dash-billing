@@ -23,11 +23,7 @@ document.addEventListener('keydown', e => {
 });
 
 window.onload = () => {
-  const savedToken = sessionStorage.getItem('google_token');
-  if (savedToken) {
-    accessToken = savedToken;
-    showDashboard();
-  }
+  // Token não é persistido entre sessões — usuário precisa fazer login ao recarregar.
 };
 
 async function carregarVersaoApp() {

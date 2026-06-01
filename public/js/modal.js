@@ -27,7 +27,10 @@ async function openModal() {
     try {
       const resp = await fetch(API_COBRANCAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-secret': getApiSecret() || ''
+        },
         body: JSON.stringify({
           nome: cliente.nome,
           valor: cliente.valor,

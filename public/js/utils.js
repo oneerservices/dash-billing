@@ -64,35 +64,10 @@ function encontrarLinhaCabecalho(allData) {
   return 1;
 }
 
-function acharColuna(headers, termos, fallback) {
-  // Mantido só por compatibilidade, mas a aba Base está mapeada fixamente.
-  return fallback;
-}
-
 function aplicarSchema(allData) {
-  // Mapeamento fixo conforme aba Base:
-  // A Data da Venda | B IMEI | C Produto | D Cliente | E Valor |
-  // F Valor Recebido | G Valor Pendente | H Status | I Vencimento 1
-  DETAIL_HEADER_ROW = 1;
-  DATA_START_ROW = 2;
-  baseHeaders = allData[DETAIL_HEADER_ROW] || [];
-
-  COL_DATA_VENDA = 0;
-  COL_IMEI = 1;
-  COL_PRODUTO = 2;
-  COL_CLIENTE = 3;
-  COL_VALOR = 4;
-  COL_RECEBIDO = 5;
-  COL_PENDENTE = 6;
-  COL_STATUS = 7;
-  COL_VENCIMENTO = 8;
-
-  paymentPairs = [
-    { numero: 1, vencimentoCol: 8,  pagamentoCol: 10 },
-    { numero: 2, vencimentoCol: 11, pagamentoCol: 13 },
-    { numero: 3, vencimentoCol: 14, pagamentoCol: 16 },
-    { numero: 4, vencimentoCol: 17, pagamentoCol: 19 }
-  ];
+  // Apenas inicializa os cabeçalhos — colunas definidas em state.js.
+  baseHeaders  = allData[DETAIL_HEADER_ROW] || [];
+  paymentPairs = PAYMENT_PAIRS;
 }
 
 function linhaTemCliente(r) {
@@ -124,28 +99,29 @@ function statusPorVencimento(rows) {
 function getVencimentosLinha(r) {
   const vencs = [];
 
-  // Vencimentos das parcelas 1..4 conforme aba Base.
-  // Usar todos resolve casos em que o vencimento atual não é o Vencimento 1.
   paymentPairs.forEach(pair => {
     const txt = r[pair.vencimentoCol];
     const data = parseDataBR(txt);
     if (data) {
       data.setHours(0, 0, 0, 0);
+      // Verifica se esta parcela já foi paga (coluna de pagamento preenchida com valor > 0).
+      const valorPago = parseValorBR(r[pair.pagamentoCol]);
       vencs.push({
         data,
         texto: txt,
-        numero: pair.numero
+        numero: pair.numero,
+        pago: valorPago > 0
       });
     }
   });
 
-  // Fallback para a coluna I/Vencimento 1.
+  // Fallback para a coluna I/Vencimento 1 se nenhuma parcela encontrada.
   if (!vencs.length) {
     const txt = r[COL_VENCIMENTO];
     const data = parseDataBR(txt);
     if (data) {
       data.setHours(0, 0, 0, 0);
-      vencs.push({ data, texto: txt, numero: 1 });
+      vencs.push({ data, texto: txt, numero: 1, pago: false });
     }
   }
 
@@ -159,13 +135,17 @@ function getVencimentoAtualLinha(r) {
     return { data: null, texto: '—', numero: null };
   }
 
-  // Regra nova:
-  // usa sempre a última coluna de vencimento preenchida:
-  // Vencimento 4 > Vencimento 3 > Vencimento 2 > Vencimento 1
-  const ultimoInformado = vencs
-    .sort((a, b) => b.numero - a.numero)[0];
+  // Regra correta: usa o vencimento pendente mais antigo (não pago).
+  // Isso garante que parcelas vencidas e não pagas apareçam como urgentes,
+  // mesmo que parcelas futuras já estejam preenchidas na planilha.
+  const pendentes = vencs
+    .filter(v => !v.pago)
+    .sort((a, b) => a.data - b.data); // mais antigo primeiro
 
-  return ultimoInformado;
+  if (pendentes.length) return pendentes[0];
+
+  // Se todas as parcelas estão pagas, retorna a última para referência.
+  return vencs.sort((a, b) => b.numero - a.numero)[0];
 }
 
 function linhaTemVencimentoNoStatus(r, statusFiltro) {

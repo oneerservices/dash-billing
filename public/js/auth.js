@@ -3,10 +3,12 @@ function signIn() {
 
   const client = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-scope: 'https://www.googleapis.com/auth/spreadsheets',    callback: (resp) => {
+    scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
+    callback: (resp) => {
       if (resp.access_token) {
         accessToken = resp.access_token;
-        sessionStorage.setItem('google_token', accessToken);
+        // Token mantido apenas em memória — não persiste em sessionStorage
+        // para evitar exposição via XSS.
         showDashboard(resp);
       }
     }
@@ -47,7 +49,6 @@ function showDashboard(resp) {
 }
 
 function signOut() {
-  sessionStorage.removeItem('google_token');
   loggedIn = false;
   document.getElementById('bottom-bar').classList.remove('visible');
   detailCache = null;
