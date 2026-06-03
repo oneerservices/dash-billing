@@ -1,6 +1,6 @@
 {
   "name": "dash-cobrancas",
-  "version": "b.e.t.a",
+  "version": "0.0.0",
   "description": "Dashboard de cobranças com front-end separado e proxy para webhook n8n.",
   "main": "server.js",
   "scripts": {
