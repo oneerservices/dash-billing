@@ -4,8 +4,8 @@ function gerarMensagemWhatsappCliente(cliente) {
   const nome = cliente?.nome || 'cliente';
   const valor = fmtBRL(cliente?.valor || 0);
 
-  return `Ei BB Atualizando: ${valor}.
-  Manda PIX`;
+  return `Ei bb Atualizando: ${valor}.
+Manda pix`;
 }
 
 function gerarLinkWhatsapp(telefone, mensagem) {
