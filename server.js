@@ -40,6 +40,13 @@ app.post('/api/cobrancas', async (req, res) => {
   }
 });
 
+
+app.get('/api/client-config', (req, res) => {
+  res.json({
+    apiSecret: process.env.API_SECRET || ''
+  });
+});
+
 app.get('/api/version', (req, res) => {
   const packageJson = require('./package.json');
 

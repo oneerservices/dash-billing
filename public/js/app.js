@@ -1,6 +1,3 @@
-document.getElementById('empty-state').style.display = 'block';
-
-
 document.addEventListener('keydown', e => {
   const detailOverlay = document.getElementById('detail-overlay');
   const isDetailOpen = detailOverlay.classList.contains('open');

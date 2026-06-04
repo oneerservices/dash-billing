@@ -82,3 +82,7 @@ function closeModal() {
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 function showEmpty() {
+  document.getElementById('empty-state').style.display = 'block';
+  document.getElementById('main-table').style.display = 'none';
+  document.getElementById('table-loading').style.display = 'none';
+}

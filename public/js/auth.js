@@ -3,7 +3,18 @@ function signIn() {
 
   const client = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
+    // Precisa de permissão de escrita para conseguir salvar contatos na aba Contatos.
+    // O escopo readonly só permite ler a planilha.
+    scope: [
+      'openid',
+      'email',
+      'profile',
+      'https://www.googleapis.com/auth/spreadsheets'
+    ].join(' '),
+    include_granted_scopes: true,
+    // Força o Google a pedir a nova permissão depois da troca do escopo.
+    // Depois que todos autorizarem uma vez, pode remover esta linha se quiser.
+    prompt: 'consent',
     callback: (resp) => {
       if (resp.access_token) {
         accessToken = resp.access_token;

@@ -99,7 +99,12 @@ async function abrirWhatsappFilaAtual() {
   }
 
   try {
-    await abrirWhatsappCliente(cliente);
+    const abriu = await abrirWhatsappCliente(cliente);
+
+    if (!abriu) {
+      renderizarFilaCobranca();
+      return;
+    }
 
     filaAguardando = true;
     renderizarFilaCobranca();
