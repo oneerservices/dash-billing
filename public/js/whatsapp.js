@@ -1,21 +1,16 @@
+const whatsappClientesEmProcessamento = new Set();
+
 function gerarMensagemWhatsappCliente(cliente) {
   const nome = cliente?.nome || 'cliente';
   const valor = fmtBRL(cliente?.valor || 0);
-  const vencimento = cliente?.data || '—';
 
-  return `Olá, ${nome}! Tudo bem?
-
-Identificamos uma pendência em aberto no valor de ${valor}, com vencimento em ${vencimento}.
-
-Por gentileza, poderia verificar a regularização?
-
-Caso já tenha realizado o pagamento, desconsidere esta mensagem.`;
+  return `Olá, ${nome}! Atualizando: o valor pendente hoje é de ${valor}.`;
 }
 
 function gerarLinkWhatsapp(telefone, mensagem) {
   const telefoneNormalizado = normalizarTelefoneWhatsApp(telefone);
 
-  if (!telefoneNormalizado) {
+  if (!telefoneWhatsAppValido(telefoneNormalizado)) {
     throw new Error('Telefone inválido');
   }
 
@@ -24,42 +19,70 @@ function gerarLinkWhatsapp(telefone, mensagem) {
   return `https://wa.me/${telefoneNormalizado}?text=${texto}`;
 }
 
+function abrirLinkWhatsappComFallback(link) {
+  // Abre somente uma nova aba.
+  // Não usa fallback com window.location.href, porque isso faz a página do sistema
+  // sair do dashboard e ir para o WhatsApp também.
+  const novaAba = window.open(link, '_blank');
+
+  if (novaAba) {
+    novaAba.opener = null;
+    return true;
+  }
+
+  alert('O navegador bloqueou a abertura do WhatsApp. Libere pop-ups para este site e tente novamente.');
+  return false;
+}
+
 async function abrirWhatsappCliente(cliente) {
   if (!cliente || !cliente.nome) {
     alert('Cliente inválido.');
-    return;
+    return false;
   }
+
+  const chaveCliente = normalizarNomeContato(cliente.nome);
+
+  if (whatsappClientesEmProcessamento.has(chaveCliente)) {
+    return false;
+  }
+
+  whatsappClientesEmProcessamento.add(chaveCliente);
 
   try {
     const contato = await buscarContatoCliente(cliente.nome);
-
     let contatoFinal = contato;
 
-if (!contatoFinal || !contatoFinal.telefone) {
-const telefoneNormalizado = await abrirModalTelefone(cliente);
+    if (!contatoFinal || !contatoFinal.telefone) {
+      const telefoneDigitado = await abrirModalTelefone(cliente);
 
-if (!telefoneNormalizado) {
-  return;
-}
+      if (!telefoneDigitado) {
+        return false;
+      }
 
-contatoFinal = await salvarContatoCliente(cliente.nome, telefoneNormalizado);
+      if (!telefoneWhatsAppValido(telefoneDigitado)) {
+        alert('Telefone inválido. Informe com DDD, exemplo: 85999999999');
+        return false;
+      }
 
-  if (!telefoneNormalizado) {
-    alert('Telefone inválido. Informe com DDD, exemplo: 85999999999');
-    return;
-  }
-
-  contatoFinal = await salvarContatoCliente(cliente.nome, telefoneNormalizado);
-}
+      // A aba do WhatsApp só pode abrir depois que o número foi informado
+      // e salvo/atualizado com sucesso na planilha.
+      contatoFinal = await salvarContatoCliente(cliente.nome, telefoneDigitado);
+    }
 
     const mensagem = gerarMensagemWhatsappCliente(cliente);
-const link = gerarLinkWhatsapp(contatoFinal.telefone, mensagem);
-    window.open(link, '_blank');
+    const link = gerarLinkWhatsapp(contatoFinal.telefone, mensagem);
+
+    abrirLinkWhatsappComFallback(link);
+    return true;
   } catch (error) {
     console.error('Erro ao abrir WhatsApp:', error);
-    alert('Não foi possível gerar o link do WhatsApp.');
+    alert(`Não foi possível gerar o link do WhatsApp. ${error.message || ''}`);
+    return false;
+  } finally {
+    whatsappClientesEmProcessamento.delete(chaveCliente);
   }
 }
+
 async function cobrarClienteAtual() {
   try {
     if (currentDetailIndex === null || currentDetailIndex < 0) {
@@ -133,7 +156,7 @@ function salvarTelefoneModal() {
 
   const telefoneNormalizado = normalizarTelefoneWhatsApp(telefone);
 
-  if (!telefoneNormalizado) {
+  if (!telefoneWhatsAppValido(telefoneNormalizado)) {
     alert('Telefone inválido. Informe com DDD, exemplo: 85999999999');
     return;
   }
