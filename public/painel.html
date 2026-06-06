@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R.Iphones — Painel Financeiro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a; --border: #2e3147;
+  --text: #e8eaf6; --muted: #7b7f9e; --blue: #4f8ef7; --green: #4ade80;
+  --red: #f87171; --yellow: #fbbf24; --orange: #fb923c; --purple: #a78bfa;
+}
+[data-theme="light"] {
+  --bg: #f0f2ff; --bg2: #ffffff; --bg3: #e8eaf6; --border: #d0d4f0;
+  --text: #1a1d27; --muted: #5a5f7e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.logo img { height: 32px; }
+.logo-section { color: var(--muted); font-size: 14px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.nav-links { display: flex; gap: 6px; }
+.nav-link { padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--muted); transition: all 0.2s; }
+.nav-link:hover, .nav-link.active { background: var(--bg3); color: var(--text); }
+.btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn:hover { border-color: var(--blue); color: var(--blue); }
+.container { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+.painel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.painel-title { font-size: 22px; font-weight: 800; }
+.painel-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+.date-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.date-input { background: var(--bg2); border: 1px solid var(--border); color: var(--text); font-family: 'Syne', sans-serif; font-size: 13px; padding: 7px 12px; border-radius: 8px; }
+.sync-badge { display: flex; align-items: center; gap: 6px; background: var(--bg2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--muted); }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.card-header { padding: 14px 18px 10px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+.card-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.card-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.card-body { padding: 16px 18px; }
+.metric-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.metric-row:last-child { border-bottom: none; }
+.metric-label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.metric-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.metric-values { text-align: right; }
+.metric-qtd { font-size: 18px; font-weight: 800; line-height: 1; }
+.metric-val { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.vendas-grid { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+.lucro-circle { position: relative; width: 72px; height: 72px; flex-shrink: 0; }
+.lucro-circle svg { transform: rotate(-90deg); }
+.lucro-circle-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; line-height: 1.2; }
+.lucro-pct { font-size: 13px; font-weight: 800; }
+.lucro-label { font-size: 8px; color: var(--muted); }
+.fin-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.fin-left { padding: 16px 18px; border-right: 1px solid var(--border); }
+.fin-right { padding: 16px 18px; }
+.fin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.fin-item:last-child { border-bottom: none; }
+.fin-label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.fin-icon { font-size: 18px; }
+.fin-values { text-align: right; }
+.fin-qtd { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+.fin-val { font-size: 15px; font-weight: 700; }
+.parcial-box { background: var(--bg3); border-radius: 10px; padding: 14px 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+.parcial-label { font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.parcial-val { font-size: 20px; font-weight: 800; color: var(--blue); font-family: 'DM Mono', monospace; }
+.info-box { background: var(--bg3); border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 11px; color: var(--muted); line-height: 1.8; }
+.loading { display: flex; align-items: center; justify-content: center; height: 300px; color: var(--muted); font-size: 14px; gap: 10px; flex-direction: column; }
+.spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.c-blue{color:var(--blue)} .c-green{color:var(--green)} .c-red{color:var(--red)}
+.c-orange{color:var(--orange)} .c-purple{color:var(--purple)}
+.bg-blue{background:rgba(79,142,247,0.15)} .bg-green{background:rgba(74,222,128,0.15)}
+.bg-red{background:rgba(248,113,113,0.15)} .bg-yellow{background:rgba(251,191,36,0.15)}
+.bg-orange{background:rgba(251,146,60,0.15)} .bg-purple{background:rgba(167,139,250,0.15)}
+@media(max-width:640px){
+  .grid-main{grid-template-columns:1fr}
+  .fin-grid{grid-template-columns:1fr}
+  .fin-left{border-right:none;border-bottom:1px solid var(--border)}
+}
+</style>
+</head>
+<body>
+<header>
+  <a href="/" class="logo">
+    <img src="assets/logo.png" alt="Rodrigo Iphones">
+    <span class="logo-section">/painel</span>
+  </a>
+  <div class="header-right">
+    <nav class="nav-links">
+      <a href="/" class="nav-link">Cobranças</a>
+      <a href="/painel.html" class="nav-link active">Painel</a>
+    </nav>
+    <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️</button>
+  </div>
+</header>
+<div class="container">
+  <div class="painel-header">
+    <div>
+      <div class="painel-title">Análise Financeira</div>
+      <div class="painel-sub" id="sub-data">carregando...</div>
+    </div>
+    <div class="date-controls">
+      <div class="sync-badge">
+        <div class="sync-dot"></div>
+        <span id="sync-time">sincronizando...</span>
+      </div>
+      <input type="date" class="date-input" id="date-input" onchange="carregarDados()">
+      <button class="btn" onclick="carregarDados()">↺ Atualizar</button>
+    </div>
+  </div>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <div>Carregando dados do banco...</div>
+  </div>
+  <div id="conteudo" style="display:none">
+    <div class="grid-main">
+      <div class="card">
+        <div class="card-header"><div class="card-icon bg-blue">📦</div><div class="card-title">Estoque</div></div>
+        <div class="card-body">
+          <div class="metric-row">
+            <div class="metric-label"><div class="metric-dot" style="background:var(--green)"></div>Entradas</div>
+            <div class="metric-values"><div class="metric-qtd c-green" id="e-entradas-qtd">—</div><div class="metric-val" id="e-entradas-val">—</div></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label"><div class="metric-dot" style="background:var(--red)"></div>Saída</div>
+            <div class="metric-values"><div class="metric-qtd c-red" id="e-saida-qtd">—</div><div class="metric-val" id="e-saida-val">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon bg-yellow">💳</div><div class="card-title">Pagamentos do dia</div></div>
+        <div class="card-body">
+          <div class="metric-row">
+            <div class="metric-label"><div class="metric-dot" style="background:var(--green)"></div>Vendas Pagas</div>
+            <div class="metric-values"><div class="metric-qtd c-green" id="p-vpagas-qtd">—</div><div class="metric-val" id="p-vpagas-val">—</div></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label"><div class="metric-dot" style="background:var(--red)"></div>Vendas Pendentes</div>
+            <div class="metric-values"><div class="metric-qtd c-red" id="p-vpend-qtd">—</div><div class="metric-val" id="p-vpend-val">—</div></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label"><div class="metric-dot" style="background:var(--blue)"></div>Compras Pagas</div>
+            <div class="metric-values"><div class="metric-qtd c-blue" id="p-cpagas-qtd">—</div><div class="metric-val" id="p-cpagas-val">—</div></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label"><div class="metric-dot" style="background:var(--orange)"></div>Compras Pendentes</div>
+            <div class="metric-values"><div class="metric-qtd c-orange" id="p-cpend-qtd">—</div><div class="metric-val" id="p-cpend-val">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon bg-green">📈</div><div class="card-title">Vendas do dia</div></div>
+        <div class="card-body">
+          <div class="vendas-grid">
+            <div>
+              <div class="metric-row">
+                <div class="metric-label">Realizadas</div>
+                <div class="metric-values"><div class="metric-qtd c-green" id="v-qtd">—</div><div class="metric-val" id="v-total">—</div></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-label">Lucro</div>
+                <div class="metric-values"><div class="metric-qtd c-blue" id="v-lucro">—</div></div>
+              </div>
+            </div>
+            <div class="lucro-circle">
+              <svg width="72" height="72" viewBox="0 0 72 72">
+                <circle cx="36" cy="36" r="28" fill="none" stroke="var(--bg3)" stroke-width="8"/>
+                <circle cx="36" cy="36" r="28" fill="none" stroke="var(--blue)" stroke-width="8" stroke-dasharray="175.9" id="lucro-arc" stroke-dashoffset="175.9" stroke-linecap="round"/>
+              </svg>
+              <div class="lucro-circle-text"><div class="lucro-pct c-blue" id="v-pct">0%</div><div class="lucro-label">lucro</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon bg-purple">⚖️</div><div class="card-title">Financeiro Total</div></div>
+      <div class="fin-grid">
+        <div class="fin-left">
+          <div class="fin-item">
+            <div class="fin-label"><span class="fin-icon">📦</span>Estoque Geral</div>
+            <div class="fin-values"><div class="fin-qtd" id="f-estoque-qtd">—</div><div class="fin-val c-blue" id="f-estoque-val">—</div></div>
+          </div>
+          <div class="fin-item">
+            <div class="fin-label"><span class="fin-icon">🔴</span>Vendas Pendentes</div>
+            <div class="fin-values"><div class="fin-qtd" id="f-vpend-qtd">—</div><div class="fin-val c-red" id="f-vpend-val">—</div></div>
+          </div>
+          <div class="fin-item">
+            <div class="fin-label"><span class="fin-icon">🟠</span>Compras Pendentes</div>
+            <div class="fin-values"><div class="fin-qtd" id="f-cpend-qtd">—</div><div class="fin-val c-orange" id="f-cpend-val">—</div></div>
+          </div>
+          <div class="parcial-box">
+            <div class="parcial-label">Saldo Parcial</div>
+            <div class="parcial-val" id="f-parcial">—</div>
+          </div>
+        </div>
+        <div class="fin-right">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Visão Geral do Saldo</div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:var(--muted)">PARCIAL</div>
+            <div style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace" class="c-blue" id="s-parcial">—</div>
+          </div>
+          <div class="info-box">
+            <div>🕐 Última sync: <span id="s-sync" style="color:var(--text)">—</span></div>
+            <div>⏱ Sync automática a cada 10 min</div>
+            <div>🗄 Banco: <span style="color:var(--green)">core_riphones_teste</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function fmt(v){return 'R$ '+parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+async function carregarDados(){
+  const data=document.getElementById('date-input').value||new Date().toISOString().split('T')[0];
+  document.getElementById('loading').style.display='flex';
+  document.getElementById('conteudo').style.display='none';
+  try{
+    const res=await fetch('/api/painel?data='+data);
+    const d=await res.json();
+    if(d.error)throw new Error(d.error);
+    const [ano,mes,dia]=d.data.split('-');
+    set('sub-data',dia+'/'+mes+'/'+ano+' — dados do banco de dados');
+    const sync=new Date(d.ultima_sync);
+    set('sync-time','sync '+sync.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
+    set('s-sync',sync.toLocaleString('pt-BR'));
+    set('e-entradas-qtd',d.estoque.entradas_qtd+' unidades');
+    set('e-entradas-val',fmt(d.estoque.entradas_val));
+    set('e-saida-qtd',d.estoque.saida_qtd+' unidades');
+    set('e-saida-val',fmt(d.estoque.saida_val));
+    set('v-qtd',d.vendas.qtd+' vendas');
+    set('v-total',fmt(d.vendas.total));
+    set('v-lucro',fmt(d.vendas.lucro));
+    set('v-pct',d.vendas.pct_lucro+'%');
+    document.getElementById('lucro-arc').style.strokeDashoffset=175.9-(175.9*Math.min(parseFloat(d.vendas.pct_lucro)/100,1));
+    set('p-vpagas-qtd',d.pagamentos.vendas_pagas_qtd+' vendas');
+    set('p-vpagas-val',fmt(d.pagamentos.vendas_pagas_val));
+    set('p-vpend-qtd',d.pagamentos.vendas_pend_qtd+' pendentes');
+    set('p-vpend-val',fmt(d.pagamentos.vendas_pend_val));
+    set('p-cpagas-qtd',d.pagamentos.compras_pagas_qtd+' compras');
+    set('p-cpagas-val',fmt(d.pagamentos.compras_pagas_val));
+    set('p-cpend-qtd',d.pagamentos.compras_pend_qtd+' pendentes');
+    set('p-cpend-val',fmt(d.pagamentos.compras_pend_val));
+    set('f-estoque-qtd',d.financeiro.estoque_geral_qtd+' unid.');
+    set('f-estoque-val',fmt(d.financeiro.estoque_geral_val));
+    set('f-vpend-qtd',d.financeiro.vendas_pend_qtd+' contas');
+    set('f-vpend-val',fmt(d.financeiro.vendas_pend_val));
+    set('f-cpend-qtd',d.financeiro.compras_pend_qtd+' contas');
+    set('f-cpend-val',fmt(d.financeiro.compras_pend_val));
+    set('f-parcial',fmt(d.financeiro.parcial));
+    set('s-parcial',fmt(d.financeiro.parcial));
+    document.getElementById('loading').style.display='none';
+    document.getElementById('conteudo').style.display='block';
+  }catch(err){document.getElementById('loading').innerHTML='<div>❌ Erro: '+err.message+'</div>';}
+}
+function toggleTheme(){
+  const html=document.documentElement;
+  const dark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('theme-btn').textContent=dark?'🌙':'☀️';
+}
+const hoje=new Date().toISOString().split('T')[0];
+document.getElementById('date-input').value=hoje;
+carregarDados();
+setInterval(carregarDados,10*60*1000);
+</script>
+</body>
+</html>
