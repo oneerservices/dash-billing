@@ -3,25 +3,35 @@
 // ============================================================
 
 async function gerarImagem() {
-  const icon  = document.getElementById('imagem-icon');
-  const label = document.getElementById('imagem-label');
+  const icon = document.getElementById("imagem-icon");
+  const label = document.getElementById("imagem-label");
 
   try {
-    if (icon) icon.textContent = '⏳';
-    if (label) label.textContent = 'Gerando...';
+    if (icon) icon.textContent = "⏳";
+    if (label) label.textContent = "Gerando...";
 
-    const nome = (document.getElementById('detail-nome')?.textContent || '').trim() || 'Cliente';
+    const nome =
+      (document.getElementById("detail-nome")?.textContent || "").trim() ||
+      "Cliente";
     const itens = Array.isArray(_currentDetailItens) ? _currentDetailItens : [];
 
     const rowsFonte =
-      (typeof baseRowsRaw !== 'undefined' && Array.isArray(baseRowsRaw) && baseRowsRaw.length)
+      typeof baseRowsRaw !== "undefined" &&
+      Array.isArray(baseRowsRaw) &&
+      baseRowsRaw.length
         ? baseRowsRaw
-        : (detailCache || itens);
+        : detailCache || itens;
 
     const ultimoPagamento = getUltimoPagamentoCliente(nome, rowsFonte);
 
-    const totalPendente = itens.reduce((s, r) => s + Math.abs(parseValorBR(r[COL_PENDENTE])), 0);
-    const totalRecebidoPeriodo = itens.reduce((s, r) => s + Math.abs(parseValorBR(r[COL_RECEBIDO])), 0);
+    const totalPendente = itens.reduce(
+      (s, r) => s + Math.abs(parseValorBR(r[COL_PENDENTE])),
+      0,
+    );
+    const totalRecebidoPeriodo = itens.reduce(
+      (s, r) => s + Math.abs(parseValorBR(r[COL_RECEBIDO])),
+      0,
+    );
 
     const hoje = new Date();
     const periodoInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -36,29 +46,39 @@ async function gerarImagem() {
     const ROW_H = 52;
     const PAD_X = 18;
     const PAD_Y = 20;
-    const BASE_H = PAD_Y + HEADER_H + 14 + SUMMARY_H + 18 + FILTER_H + 16 + TABLE_HEAD_H + 24 + 22;
+    const BASE_H =
+      PAD_Y +
+      HEADER_H +
+      14 +
+      SUMMARY_H +
+      18 +
+      FILTER_H +
+      16 +
+      TABLE_HEAD_H +
+      24 +
+      60;
     const H = Math.max(460, BASE_H + Math.max(1, itens.length) * ROW_H);
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = W * 2;
     canvas.height = H * 2;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.scale(2, 2);
 
     const C = {
-      bg: '#ffffff',
-      panel: '#ffffff',
-      panel2: '#ffffff',
-      panel3: '#f5f5f5',
-      border: '#d9d9d9',
-      text: '#000000',
-      muted: '#000000',
-      green: '#00a86b',
-      greenHeader: '#ffffff',
-      red: '#d90429',
-      redDark: '#b10322',
-      white: '#ffffff'
+      bg: "#ffffff",
+      panel: "#ffffff",
+      panel2: "#ffffff",
+      panel3: "#f5f5f5",
+      border: "#d9d9d9",
+      text: "#000000",
+      muted: "#000000",
+      green: "#00a86b",
+      greenHeader: "#ffffff",
+      red: "#d90429",
+      redDark: "#b10322",
+      white: "#ffffff",
     };
 
     function rr(x, y, w, h, r, fill, stroke) {
@@ -87,21 +107,21 @@ async function gerarImagem() {
       }
     }
 
-    function txt(t, x, y, font, color, align = 'left') {
+    function txt(t, x, y, font, color, align = "left") {
       ctx.font = font;
       ctx.fillStyle = color;
       ctx.textAlign = align;
-      ctx.fillText(String(t ?? ''), x, y);
-      ctx.textAlign = 'left';
+      ctx.fillText(String(t ?? ""), x, y);
+      ctx.textAlign = "left";
     }
 
-    function fitText(texto, maxW, startSize, weight = 'bold') {
+    function fitText(texto, maxW, startSize, weight = "bold") {
       let size = startSize;
 
       while (size > 12) {
         ctx.font = `${weight} ${size}px Arial`;
 
-        if (ctx.measureText(String(texto || '')).width <= maxW) {
+        if (ctx.measureText(String(texto || "")).width <= maxW) {
           break;
         }
 
@@ -112,8 +132,8 @@ async function gerarImagem() {
     }
 
     function fmtDate(d) {
-      if (!d) return '—';
-      return new Date(d).toLocaleDateString('pt-BR');
+      if (!d) return "—";
+      return new Date(d).toLocaleDateString("pt-BR");
     }
 
     function parseDataBR(dataStr) {
@@ -148,7 +168,7 @@ async function gerarImagem() {
     function diasDesdeCompra(dataStr) {
       const dataCompra = parseDataBR(dataStr);
 
-      if (!dataCompra) return '—';
+      if (!dataCompra) return "—";
 
       const hoje = new Date();
       hoje.setHours(0, 0, 0, 0);
@@ -158,7 +178,7 @@ async function gerarImagem() {
       const diffMs = hoje - dataCompra;
       const dias = Math.floor(diffMs / 86400000);
 
-      return dias >= 0 ? `${dias}d` : '0d';
+      return dias >= 0 ? `${dias}d` : "0d";
     }
 
     // fundo
@@ -171,18 +191,31 @@ async function gerarImagem() {
     // cabeçalho
     const headerY = PAD_Y;
 
-    txt('CONSULTA DE COBRANÇAS 2026', PAD_X + 8, headerY + 32, 'bold 24px Arial', C.text);
-    txt(new Date().toLocaleDateString('pt-BR'), W - PAD_X - 8, headerY + 32, '14px Arial', C.muted, 'right');
+    txt(
+      "CONSULTA DE COBRANÇAS 2026",
+      PAD_X + 8,
+      headerY + 32,
+      "bold 24px Arial",
+      C.text,
+    );
+    txt(
+      new Date().toLocaleDateString("pt-BR"),
+      W - PAD_X - 8,
+      headerY + 32,
+      "14px Arial",
+      C.muted,
+      "right",
+    );
 
     // resumo
     const y1 = headerY + HEADER_H;
 
     const leftCols = [255, 205, 200, 235];
     const leftTitles = [
-      'PERÍODO',
-      'RECEBIDOS NO PERÍODO',
-      'DATA ÚLTIMO PAGAMENTO',
-      'VALOR ÚLTIMO PAGAMENTO'
+      "PERÍODO",
+      "RECEBIDOS NO PERÍODO",
+      "DATA ÚLTIMO PAGAMENTO",
+      "VALOR ÚLTIMO PAGAMENTO",
     ];
 
     const gapAfterSummary = 18;
@@ -201,7 +234,14 @@ async function gerarImagem() {
 
     for (let i = 0; i < leftCols.length; i++) {
       rr(x, y1, leftCols[i], 30, 0, C.greenHeader, C.border);
-      txt(leftTitles[i], x + leftCols[i] / 2, y1 + 20, 'bold 12px Arial', C.muted, 'center');
+      txt(
+        leftTitles[i],
+        x + leftCols[i] / 2,
+        y1 + 20,
+        "bold 12px Arial",
+        C.muted,
+        "center",
+      );
       x += leftCols[i];
     }
 
@@ -212,21 +252,21 @@ async function gerarImagem() {
     rr(debtBoxX + 12, totalDebtTop + 12, debtBoxW - 24, 44, 9, C.redDark, null);
 
     txt(
-      'TOTAL DA DÍVIDA',
+      "TOTAL DA DÍVIDA",
       debtBoxX + debtBoxW / 2,
       totalDebtTop + 42,
-      'bold 23px Arial',
+      "bold 23px Arial",
       C.white,
-      'center'
+      "center",
     );
 
     txt(
-      '-' + fmtBRL(Math.abs(totalPendente)).replace('-', ''),
+      "-" + fmtBRL(Math.abs(totalPendente)).replace("-", ""),
       debtBoxX + debtBoxW / 2,
       totalDebtTop + 122,
-      'bold 52px Arial',
+      "bold 52px Arial",
       C.white,
-      'center'
+      "center",
     );
 
     x = PAD_X;
@@ -235,30 +275,65 @@ async function gerarImagem() {
     const boxH = 70;
 
     rr(x, boxY, leftCols[0], boxH, 0, C.panel2, C.border);
-    txt(fmtDate(periodoInicio), x + leftCols[0] / 2, boxY + 27, 'bold 14px Arial', C.text, 'center');
-    txt(fmtDate(periodoFim), x + leftCols[0] / 2, boxY + 54, 'bold 14px Arial', C.text, 'center');
+    txt(
+      fmtDate(periodoInicio),
+      x + leftCols[0] / 2,
+      boxY + 27,
+      "bold 14px Arial",
+      C.text,
+      "center",
+    );
+    txt(
+      fmtDate(periodoFim),
+      x + leftCols[0] / 2,
+      boxY + 54,
+      "bold 14px Arial",
+      C.text,
+      "center",
+    );
     x += leftCols[0];
 
     rr(x, boxY, leftCols[1], boxH, 0, C.panel2, C.border);
-    txt(fmtBRL(totalRecebidoPeriodo), x + leftCols[1] / 2, boxY + 43, 'bold 20px Arial', C.green, 'center');
+    txt(
+      fmtBRL(totalRecebidoPeriodo),
+      x + leftCols[1] / 2,
+      boxY + 43,
+      "bold 20px Arial",
+      C.green,
+      "center",
+    );
     x += leftCols[1];
 
     rr(x, boxY, leftCols[2], boxH, 0, C.panel2, C.border);
-    txt(ultimoPagamento?.data || '—', x + leftCols[2] / 2, boxY + 43, 'bold 17px Arial', C.text, 'center');
+    txt(
+      ultimoPagamento?.data || "—",
+      x + leftCols[2] / 2,
+      boxY + 43,
+      "bold 17px Arial",
+      C.text,
+      "center",
+    );
     x += leftCols[2];
 
     rr(x, boxY, leftCols[3], boxH, 0, C.panel2, C.border);
-    txt(ultimoPagamento?.valorStr || '—', x + leftCols[3] / 2, boxY + 43, 'bold 20px Arial', C.green, 'center');
+    txt(
+      ultimoPagamento?.valorStr || "—",
+      x + leftCols[3] / 2,
+      boxY + 43,
+      "bold 20px Arial",
+      C.green,
+      "center",
+    );
 
     // identificação do cliente
     const yFilter = boxY + boxH + gapAfterSummary;
 
     rr(PAD_X, yFilter, 110, FILTER_H, 0, C.greenHeader, C.border);
-    txt('Cliente:', PAD_X + 55, yFilter + 30, '14px Arial', C.muted, 'center');
+    txt("Cliente:", PAD_X + 55, yFilter + 30, "14px Arial", C.muted, "center");
 
     rr(PAD_X + 110, yFilter, 395, FILTER_H, 0, C.panel2, C.border);
 
-    const clientFont = fitText(nome, 370, 22, 'bold');
+    const clientFont = fitText(nome, 370, 22, "bold");
     txt(nome, PAD_X + 122, yFilter + 31, clientFont, C.text);
 
     // tabela
@@ -267,20 +342,20 @@ async function gerarImagem() {
     rr(PAD_X, tableY, W - PAD_X * 2, TABLE_HEAD_H, 0, C.greenHeader, C.border);
 
     const colSpecs = [
-      ['Data da Venda', 115],
-      ['IMEI', 130],
-      ['Produto', 285],
-      ['Valor', 120],
-      ['Valor Recebido', 145],
-      ['Valor Pendente', 155],
-      ['Vencimento Atual', 140],
-      ['Dias da Compra', 120]
+      ["Data da Venda", 115],
+      ["IMEI", 130],
+      ["Produto", 285],
+      ["Valor", 120],
+      ["Valor Recebido", 145],
+      ["Valor Pendente", 155],
+      ["Vencimento Atual", 140],
+      ["Dias da Compra", 120],
     ];
 
     x = PAD_X + 6;
 
     colSpecs.forEach(([labelTxt, w]) => {
-      txt(labelTxt, x, tableY + 26, 'bold 12px Arial', C.muted);
+      txt(labelTxt, x, tableY + 26, "bold 12px Arial", C.muted);
       x += w;
     });
 
@@ -288,7 +363,13 @@ async function gerarImagem() {
 
     if (!itens.length) {
       rr(PAD_X, rowY, W - PAD_X * 2, ROW_H, 0, C.panel2, C.border);
-      txt('Nenhum item em aberto.', PAD_X + 12, rowY + 32, '14px Arial', C.text);
+      txt(
+        "Nenhum item em aberto.",
+        PAD_X + 12,
+        rowY + 32,
+        "14px Arial",
+        C.text,
+      );
       rowY += ROW_H;
     } else {
       itens.forEach((r, idx) => {
@@ -296,80 +377,96 @@ async function gerarImagem() {
 
         rr(PAD_X, rowY, W - PAD_X * 2, ROW_H, 0, bg, C.border);
 
-        const dataVenda = r[COL_DATA_VENDA] || '—';
-        const imei = r[COL_IMEI] || '—';
-        const produto = r[COL_PRODUTO] || 'Produto';
+        const dataVenda = r[COL_DATA_VENDA] || "—";
+        const imei = r[COL_IMEI] || "—";
+        const produto = r[COL_PRODUTO] || "Produto";
 
         const valor = fmtBRL(Math.abs(parseValorBR(r[COL_VALOR])));
         const recebido = fmtBRL(Math.abs(parseValorBR(r[COL_RECEBIDO])));
-        const pendente = '-' + fmtBRL(Math.abs(parseValorBR(r[COL_PENDENTE]))).replace('-', '');
+        const pendente =
+          "-" +
+          fmtBRL(Math.abs(parseValorBR(r[COL_PENDENTE]))).replace("-", "");
 
-        const venc = getVencimentoAtualLinha(r).texto || r[COL_VENCIMENTO] || '—';
+        const venc =
+          getVencimentoAtualLinha(r).texto || r[COL_VENCIMENTO] || "—";
         const diasCompra = diasDesdeCompra(dataVenda);
 
         let x2 = PAD_X + 6;
 
-        txt(dataVenda, x2, rowY + 33, '14px Arial', C.text);
+        txt(dataVenda, x2, rowY + 33, "14px Arial", C.text);
         x2 += 115;
 
-        txt(imei, x2, rowY + 33, '14px Arial', C.text);
+        txt(imei, x2, rowY + 33, "14px Arial", C.text);
         x2 += 130;
 
         let prod = String(produto);
-        ctx.font = '14px Arial';
+        ctx.font = "14px Arial";
 
         while (ctx.measureText(prod).width > 265 && prod.length > 1) {
           prod = prod.slice(0, -1);
         }
 
         if (prod !== String(produto)) {
-          prod += '…';
+          prod += "…";
         }
 
-        txt(prod, x2, rowY + 33, '14px Arial', C.text);
+        txt(prod, x2, rowY + 33, "14px Arial", C.text);
         x2 += 285;
 
-        txt(valor, x2, rowY + 33, 'bold 14px Arial', C.text);
+        txt(valor, x2, rowY + 33, "bold 14px Arial", C.text);
         x2 += 120;
 
-        txt(recebido, x2, rowY + 33, 'bold 14px Arial', C.green);
+        txt(recebido, x2, rowY + 33, "bold 14px Arial", C.green);
         x2 += 145;
 
-        txt(pendente, x2, rowY + 33, 'bold 14px Arial', C.red);
+        txt(pendente, x2, rowY + 33, "bold 14px Arial", C.red);
         x2 += 155;
 
-        txt(venc, x2, rowY + 33, '14px Arial', C.text);
+        txt(venc, x2, rowY + 33, "14px Arial", C.text);
         x2 += 140;
 
-        txt(diasCompra, x2, rowY + 33, 'bold 14px Arial', C.text);
+        txt(diasCompra, x2, rowY + 33, "bold 14px Arial", C.text);
 
         rowY += ROW_H;
       });
     }
+    // Aviso no rodapé
+    ctx.font = "bold 12px Arial";
+    ctx.fillStyle = "#666666";
+    ctx.textAlign = "center";
 
-    const link = document.createElement('a');
-    const dataArquivo = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    ctx.fillText(
+      "Compras ou pagamentos recentes podem ainda não constar nesta imagem.",
+      W / 2,
+      H - 20,
+    );
 
-    link.download = `cobranca_${nome.replace(/\s+/g, '_')}_${dataArquivo}.png`;
-    link.href = canvas.toDataURL('image/png');
+    ctx.textAlign = "left";
+    const link = document.createElement("a");
+    const dataArquivo = new Date()
+      .toLocaleDateString("pt-BR")
+      .replace(/\//g, "-");
+
+    link.download = `cobranca_${nome.replace(/\s+/g, "_")}_${dataArquivo}.png`;
+    link.href = canvas.toDataURL("image/png");
     link.click();
 
-    if (icon) icon.textContent = '✅';
-    if (label) label.textContent = 'Imagem baixada!';
+    if (icon) icon.textContent = "✅";
+    if (label) label.textContent = "Imagem baixada!";
 
     setTimeout(() => {
-      if (icon) icon.textContent = '📸';
-      if (label) label.textContent = 'Gerar Imagem';
+      if (icon) icon.textContent = "📸";
+      if (label) label.textContent = "Gerar Imagem";
     }, 2500);
   } catch (e) {
     console.error(e);
 
-    if (icon) icon.textContent = '❌';
-    if (label) label.textContent = 'Erro ao gerar';
+    if (icon) icon.textContent = "❌";
+    if (label) label.textContent = "Erro ao gerar";
 
     setTimeout(() => {
-      if (icon) icon.textContent = '📸';
-      if (label) label.textContent = 'Gerar Imagem';
+      if (icon) icon.textContent = "📸";
+      if (label) label.textContent = "Gerar Imagem";
     }, 2500);
   }
 }
