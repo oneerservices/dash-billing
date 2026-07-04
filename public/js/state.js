@@ -23,6 +23,7 @@ const PAYMENT_PAIRS = [
   { numero: 2, vencimentoCol: 11, pagamentoCol: 13 }, // L / N
   { numero: 3, vencimentoCol: 14, pagamentoCol: 16 }, // O / Q
   { numero: 4, vencimentoCol: 17, pagamentoCol: 19 }, // R / T
+  { numero: 5, vencimentoCol: 20, pagamentoCol: 22 }, // U / W
 ];
 
 // =============================================================

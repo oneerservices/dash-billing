@@ -59,12 +59,16 @@ async function gerarImagem() {
       60;
     const H = Math.max(460, BASE_H + Math.max(1, itens.length) * ROW_H);
 
+    // Fator de escala do canvas: 2 = nitidez máxima (tipo retina) porém
+    // arquivo pesado; 1.5 mantém boa nitidez com ~44% menos pixels.
+    const SCALE = 1.5;
+
     const canvas = document.createElement("canvas");
-    canvas.width = W * 2;
-    canvas.height = H * 2;
+    canvas.width = W * SCALE;
+    canvas.height = H * SCALE;
 
     const ctx = canvas.getContext("2d");
-    ctx.scale(2, 2);
+    ctx.scale(SCALE, SCALE);
 
     const C = {
       bg: "#ffffff",
@@ -447,8 +451,8 @@ async function gerarImagem() {
       .toLocaleDateString("pt-BR")
       .replace(/\//g, "-");
 
-    link.download = `cobranca_${nome.replace(/\s+/g, "_")}_${dataArquivo}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.download = `cobranca_${nome.replace(/\s+/g, "_")}_${dataArquivo}.jpg`;
+    link.href = canvas.toDataURL("image/jpeg", 0.85);
     link.click();
 
     if (icon) icon.textContent = "✅";
