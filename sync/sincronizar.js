@@ -144,7 +144,7 @@ async function sincronizarProdutos(sheets) {
           await client.query(
             `INSERT INTO produtos
               (nome, imei, categoria_id, fornecedor_id, custo, reparo, motoqueiro, bateria, localizacao, disponibilidade, observacoes, reparo_pago)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
             [nome, imei, categoriaId, fornecedorId, custo, reparo, motoqueiro, bateria, localizacao, disponibilidade, observacoes, reparo_pago]
           );
           inseridos++;
