@@ -2,9 +2,10 @@
 // detail-image.js — Geração da imagem canvas do extrato
 // ============================================================
 
-async function gerarImagem() {
-  const icon = document.getElementById("imagem-icon");
-  const label = document.getElementById("imagem-label");
+async function gerarImagem(comJuros = false, iconId = "imagem-icon", labelId = "imagem-label") {
+  const icon = document.getElementById(iconId);
+  const label = document.getElementById(labelId);
+  const labelPadrao = comJuros ? "Gerar Imagem Com Juros" : "Gerar Imagem";
 
   try {
     if (icon) icon.textContent = "⏳";
@@ -46,6 +47,16 @@ async function gerarImagem() {
     const ROW_H = 52;
     const PAD_X = 18;
     const PAD_Y = 20;
+    const jurosPorItem = itens.map(r => {
+      const vencObj = getVencimentoAtualLinha(r);
+      const pendenteItem = Math.abs(parseValorBR(r[COL_PENDENTE]));
+      if (!vencObj || !vencObj.data) return { temJuros: false, valor: pendenteItem };
+      const j = calcularJuros(pendenteItem, vencObj.data);
+      return { temJuros: j.diasComJuros > 0, valor: j.valorAtualizado, valorJuros: j.valorJuros };
+    });
+
+    const totalPendenteComJuros = jurosPorItem.reduce((s, j) => s + j.valor, 0);
+
     const BASE_H =
       PAD_Y +
       HEADER_H +
@@ -59,12 +70,16 @@ async function gerarImagem() {
       60;
     const H = Math.max(460, BASE_H + Math.max(1, itens.length) * ROW_H);
 
+    // Fator de escala do canvas: 2 = nitidez máxima (tipo retina) porém
+    // arquivo pesado; 1.5 mantém boa nitidez com ~44% menos pixels.
+    const SCALE = 1.5;
+
     const canvas = document.createElement("canvas");
-    canvas.width = W * 2;
-    canvas.height = H * 2;
+    canvas.width = W * SCALE;
+    canvas.height = H * SCALE;
 
     const ctx = canvas.getContext("2d");
-    ctx.scale(2, 2);
+    ctx.scale(SCALE, SCALE);
 
     const C = {
       bg: "#ffffff",
@@ -252,22 +267,33 @@ async function gerarImagem() {
     rr(debtBoxX + 12, totalDebtTop + 12, debtBoxW - 24, 44, 9, C.redDark, null);
 
     txt(
-      "TOTAL DA DÍVIDA",
+      comJuros ? "TOTAL DA DÍVIDA (COM JUROS HOJE)" : "TOTAL DA DÍVIDA",
       debtBoxX + debtBoxW / 2,
       totalDebtTop + 42,
-      "bold 23px Arial",
+      comJuros ? "bold 18px Arial" : "bold 23px Arial",
       C.white,
       "center",
     );
 
     txt(
-      "-" + fmtBRL(Math.abs(totalPendente)).replace("-", ""),
+      "-" + fmtBRL(Math.abs(comJuros ? totalPendenteComJuros : totalPendente)).replace("-", ""),
       debtBoxX + debtBoxW / 2,
       totalDebtTop + 122,
       "bold 52px Arial",
       C.white,
       "center",
     );
+
+    if (comJuros) {
+      txt(
+        `Valor original: ${fmtBRL(totalPendente)} · carência 3d, 1% a.d.`,
+        debtBoxX + debtBoxW / 2,
+        totalDebtTop + 145,
+        "12px Arial",
+        "#ffe2e2",
+        "center",
+      );
+    }
 
     x = PAD_X;
 
@@ -383,9 +409,12 @@ async function gerarImagem() {
 
         const valor = fmtBRL(Math.abs(parseValorBR(r[COL_VALOR])));
         const recebido = fmtBRL(Math.abs(parseValorBR(r[COL_RECEBIDO])));
+        const infoJuros = jurosPorItem[idx] || { temJuros: false, valor: Math.abs(parseValorBR(r[COL_PENDENTE])) };
+        const usarValorComJuros = comJuros && infoJuros.temJuros;
         const pendente =
           "-" +
-          fmtBRL(Math.abs(parseValorBR(r[COL_PENDENTE]))).replace("-", "");
+          fmtBRL(Math.abs(usarValorComJuros ? infoJuros.valor : parseValorBR(r[COL_PENDENTE]))).replace("-", "");
+        const corPendente = usarValorComJuros ? "#c76b00" : C.red;
 
         const venc =
           getVencimentoAtualLinha(r).texto || r[COL_VENCIMENTO] || "—";
@@ -400,9 +429,11 @@ async function gerarImagem() {
         x2 += 130;
 
         let prod = String(produto);
+        const sufixoJuros = usarValorComJuros ? " 🧮 c/ juros" : "";
+        const larguraMaxProduto = usarValorComJuros ? 200 : 265;
         ctx.font = "14px Arial";
 
-        while (ctx.measureText(prod).width > 265 && prod.length > 1) {
+        while (ctx.measureText(prod).width > larguraMaxProduto && prod.length > 1) {
           prod = prod.slice(0, -1);
         }
 
@@ -411,6 +442,9 @@ async function gerarImagem() {
         }
 
         txt(prod, x2, rowY + 33, "14px Arial", C.text);
+        if (usarValorComJuros) {
+          txt(sufixoJuros, x2 + ctx.measureText(prod).width + 4, rowY + 33, "bold 12px Arial", "#c76b00");
+        }
         x2 += 285;
 
         txt(valor, x2, rowY + 33, "bold 14px Arial", C.text);
@@ -419,7 +453,7 @@ async function gerarImagem() {
         txt(recebido, x2, rowY + 33, "bold 14px Arial", C.green);
         x2 += 145;
 
-        txt(pendente, x2, rowY + 33, "bold 14px Arial", C.red);
+        txt(pendente, x2, rowY + 33, "bold 14px Arial", corPendente);
         x2 += 155;
 
         txt(venc, x2, rowY + 33, "14px Arial", C.text);
@@ -436,7 +470,9 @@ async function gerarImagem() {
     ctx.textAlign = "center";
 
     ctx.fillText(
-      "Compras ou pagamentos recentes podem ainda não constar nesta imagem.",
+      comJuros
+        ? "Itens marcados com 🧮 já incluem juro (carência 3d, 1% a.d.). Compras/pagamentos recentes podem não constar."
+        : "Compras ou pagamentos recentes podem ainda não constar nesta imagem.",
       W / 2,
       H - 20,
     );
@@ -447,16 +483,17 @@ async function gerarImagem() {
       .toLocaleDateString("pt-BR")
       .replace(/\//g, "-");
 
-    link.download = `cobranca_${nome.replace(/\s+/g, "_")}_${dataArquivo}.png`;
-    link.href = canvas.toDataURL("image/png");
+    const sufixoArquivo = comJuros ? "_com_juros" : "";
+    link.download = `cobranca_${nome.replace(/\s+/g, "_")}_${dataArquivo}${sufixoArquivo}.jpg`;
+    link.href = canvas.toDataURL("image/jpeg", 0.85);
     link.click();
 
     if (icon) icon.textContent = "✅";
     if (label) label.textContent = "Imagem baixada!";
 
     setTimeout(() => {
-      if (icon) icon.textContent = "📸";
-      if (label) label.textContent = "Gerar Imagem";
+      if (icon) icon.textContent = comJuros ? "🧮" : "📸";
+      if (label) label.textContent = labelPadrao;
     }, 2500);
   } catch (e) {
     console.error(e);
@@ -465,8 +502,8 @@ async function gerarImagem() {
     if (label) label.textContent = "Erro ao gerar";
 
     setTimeout(() => {
-      if (icon) icon.textContent = "📸";
-      if (label) label.textContent = "Gerar Imagem";
+      if (icon) icon.textContent = comJuros ? "🧮" : "📸";
+      if (label) label.textContent = labelPadrao;
     }, 2500);
   }
 }

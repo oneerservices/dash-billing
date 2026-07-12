@@ -1,33 +1,42 @@
 :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --surface2: #1a1a24;
-    --border: #2a2a3a;
-    --accent: #00e5a0;
-    --accent2: #ff6b35;
-    --warn: #ffd600;
-    --text: #f0f0f8;
-    --muted: #6b6b8a;
-    --red: #ff4560;
-    --green: #00e5a0;
-    --yellow: #ffd600;
-    --font-head: 'Syne', sans-serif;
+    --bg: #0b1120;
+    --surface: #1a2235;
+    --surface2: #1f2b40;
+    --border: rgba(255,255,255,.09);
+    --border2: rgba(255,255,255,.16);
+    --accent: #10b981;
+    --accent2: #3b82f6;
+    --warn: #f59e0b;
+    --text: #f0f6ff;
+    --muted: #7b93b8;
+    --red: #ef4444;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --cyan: #06b6d4;
+    --radius: 16px;
+    --font-head: 'Inter', system-ui, sans-serif;
     --font-mono: 'DM Mono', monospace;
   }
 
 body.light-theme {
-  --bg: #dde3ec;
-  --surface: #eef2f7;
-  --surface2: #e5ebf3;
-  --border: #c5cedd;
-  --accent: #009f73;
-  --accent2: #db5c30;
-  --warn: #a97900;
-  --text: #172033;
-  --muted: #657085;
-  --red: #cf3049;
-  --green: #00946c;
-  --yellow: #b98400;
+  --bg: #eef2f8;
+  --surface: #ffffff;
+  --surface2: #f4f7fb;
+  --border: #d7e0ec;
+  --border2: #c2ceda;
+  --accent: #0ea472;
+  --accent2: #2f6fe0;
+  --warn: #b97a08;
+  --text: #131c2c;
+  --muted: #5c6d85;
+  --red: #d43f3f;
+  --green: #0ea472;
+  --yellow: #b97a08;
+  --blue: #2f6fe0;
+  --purple: #7c4fe0;
+  --cyan: #0891a8;
 }
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -877,7 +886,12 @@ body.light-theme {
     background: var(--surface);
   }
 
-  .footer-btns { display: flex; gap: 10px; }
+  .footer-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn-imagem-juros {
+    background: linear-gradient(135deg, #b97a08, var(--warn));
+  }
+  .btn-imagem-juros:hover { box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
 
   .btn-imagem {
     flex: 1;
@@ -1626,4 +1640,147 @@ body.light-theme {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+/* ============================================================
+   Bloco de simulação de juros e modal de baixa
+   ============================================================ */
+
+.juros-bloco {
+  grid-column: 1 / -1;
+  margin-top: 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 12px);
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-simular-juros {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--border2);
+  color: var(--muted);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.btn-simular-juros:hover {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.juros-titulo {
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.juros-obs {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.juros-resumo-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.juros-valor-hoje {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.juros-total-card {
+  margin-bottom: 16px;
+}
+
+.juros-total-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.juros-total-btn {
+  margin-top: 0;
+  width: auto;
+  flex: 0 0 auto;
+  padding: 10px 16px;
+}
+
+.juros-projecao-wrap {
+  position: relative;
+}
+
+.juros-projecao-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 12px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent2) transparent;
+}
+
+.juros-projecao-scroll > .juros-dia { scroll-snap-align: start; }
+
+.juros-projecao-scroll::-webkit-scrollbar { height: 5px; }
+.juros-projecao-scroll::-webkit-scrollbar-track { background: transparent; margin: 0 4px; }
+.juros-projecao-scroll::-webkit-scrollbar-thumb {
+  background: var(--accent2);
+  border-radius: 99px;
+}
+.juros-projecao-scroll::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+
+.juros-dia {
+  flex: 0 0 auto;
+  min-width: 84px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.juros-dia.com-juros {
+  border-color: var(--red);
+}
+
+.juros-dia-data {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.juros-dia-valor {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.juros-dia.com-juros .juros-dia-valor {
+  color: var(--red);
 }
