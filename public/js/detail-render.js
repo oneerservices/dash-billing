@@ -93,18 +93,24 @@ function renderDetailBody(nome, itens) {
     return s || 'Pendente';
   };
 
-  const itemsHTML = itens.map(r => {
+  window._currentDetailItensJuros = itens;
+
+  const itemsHTML = itens.map((r, idx) => {
     const produto = r[COL_PRODUTO] || '—';
     const imei = r[COL_IMEI] || '—';
     const dataVenda = r[COL_DATA_VENDA] || '—';
     const valorStr = fmt(r[COL_VALOR]).str;
     const recebidoStr = fmt(r[COL_RECEBIDO]).str;
+    const pendenteVal = fmt(r[COL_PENDENTE]).val;
     const pendenteStr = fmt(r[COL_PENDENTE]).str;
     const statusRaw = r[COL_STATUS] || 'Pendente';
-    const vencimento = (getVencimentoAtualLinha(r).texto || r[COL_VENCIMENTO] || '—');
+    const vencObj = getVencimentoAtualLinha(r);
+    const vencimento = (vencObj.texto || r[COL_VENCIMENTO] || '—');
     const atraso = calcularDiasAtrasoLinha(r);
     const statusClass = getStatusClass(statusRaw);
     const statusLabel = getStatusLabel(statusRaw);
+
+    const jurosHTML = renderBotaoJuros(idx, pendenteVal, vencObj.data);
 
     return `
       <div class="detail-item">
@@ -119,6 +125,7 @@ function renderDetailBody(nome, itens) {
           <div class="detail-meta-chip">Atraso: <strong>${atraso}d</strong></div>
           <span class="detail-status-mini ${statusClass}">${statusLabel}</span>
         </div>
+        ${jurosHTML}
       </div>`;
   }).join('');
 
@@ -127,6 +134,8 @@ function renderDetailBody(nome, itens) {
       ${sidebar}
 
       <section class="detail-main-clean">
+        ${renderCardJurosTotal(itens)}
+
         <div class="detail-main-clean-head">
           <div class="detail-section-title" style="margin-bottom:0">Itens em aberto</div>
           <div class="detail-count-pill">${itens.length} item(ns)</div>
@@ -135,4 +144,3 @@ function renderDetailBody(nome, itens) {
       </section>
     </div>`;
 }
-

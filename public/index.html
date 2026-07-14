@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>R.Iphones — Cobranças</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="stylesheet" href="css/style.css">
 
@@ -165,6 +165,11 @@
     <span id="imagem-label">Gerar Imagem</span>
   </button>
 
+  <button class="btn-imagem btn-imagem-juros" id="btn-imagem-juros" onclick="gerarImagem(true, 'imagem-icon-juros', 'imagem-label-juros')">
+    <span id="imagem-icon-juros">🧮</span>
+    <span id="imagem-label-juros">Gerar Imagem Com Juros</span>
+  </button>
+
   <button class="btn-copiar" id="btn-copiar" onclick="copiarMensagem()">
     <span id="copiar-icon">📋</span>
     <span id="copiar-label">Copiar Texto</span>
@@ -291,6 +296,7 @@
 <script src="js/config-loader.js"></script>
 <script src="js/state.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/juros.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/api.js"></script>
 <script src="js/contacts.js"></script>
@@ -301,6 +307,7 @@
 <script src="js/detail-perfil.js"></script>
 <script src="js/detail-image.js"></script>
 <script src="js/detail-render.js"></script>
+<script src="js/detail-juros.js"></script>
 <script src="js/detail-modal.js"></script>
 <script src="js/table.js"></script>
 <script src="js/modal.js"></script>
